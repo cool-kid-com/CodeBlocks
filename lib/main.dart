@@ -27,27 +27,27 @@ class CubeControlPanel extends StatefulWidget {
 }
 
 class _CubeControlPanelState extends State<CubeControlPanel> {
-  double cubeSize = 50.0; // Start with smaller cube
+  double cubeSize = 50.0;
   double rotateX = 0.0;
   double rotateY = 0.0;
 
   void increaseSize() {
     setState(() {
-      cubeSize = (cubeSize + 10.0).clamp(20.0, 200.0); // Limit max size
+      cubeSize = (cubeSize + 10.0).clamp(20.0, 200.0);
     });
   }
 
   void decreaseSize() {
     setState(() {
-      cubeSize = (cubeSize - 10.0).clamp(20.0, 200.0); // Limit min size
+      cubeSize = (cubeSize - 10.0).clamp(20.0, 200.0);
     });
   }
 
   void resetSize() {
     setState(() {
-      cubeSize = 50.0; // Reset to initial size
-      rotateX = 0.0;  // Reset rotation X
-      rotateY = 0.0;  // Reset rotation Y
+      cubeSize = 50.0;
+      rotateX = 0.0;
+      rotateY = 0.0;
     });
   }
 
@@ -57,136 +57,82 @@ class _CubeControlPanelState extends State<CubeControlPanel> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          width: 300.0, // Fixed large square size
-          height: 300.0, // Fixed large square size
+          width: 300.0,
+          height: 300.0,
           child: ClipRect(
             child: GestureDetector(
               onPanUpdate: (details) {
-                if (details.localPosition.dx >= 0 &&
-                    details.localPosition.dx <= 300 &&
-                    details.localPosition.dy >= 0 &&
-                    details.localPosition.dy <= 300) {
-                  setState(() {
-                    rotateY += details.delta.dx * 0.01;
-                    rotateX -= details.delta.dy * 0.01; // Invert Y for natural feel
-                  });
-                }
+                setState(() {
+                  rotateY += details.delta.dx * 0.01;
+                  rotateX -= details.delta.dy * 0.01;
+                });
               },
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    color: Colors.black12,
-                    child: Transform(
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.002) // Perspective
-                        ..rotateX(rotateX)
-                        ..rotateY(rotateY),
-                      alignment: Alignment(0.0, 0.0), // Centered on dot (adjust if needed)
-                      // Alternative alignment based on your request: Alignment(2 / cubeSize, 2 / cubeSize) if offset intended
-                      child: Stack(
-                        children: [
-                          // Front face (centered on dot)
-                          Transform(
-                            transform: Matrix4.identity(),
-                            alignment: Alignment.center,
-                            child: Container(
-                              width: cubeSize,
-                              height: cubeSize,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(color: Colors.black, width: 1.0),
-                              ),
+              child: RepaintBoundary(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      color: Colors.black12,
+                      child: Transform(
+                        transform: Matrix4.identity()
+                          ..setEntry(3, 2, 0.004) // Increased perspective
+                          ..rotateX(rotateX)
+                          ..rotateY(rotateY),
+                        alignment: Alignment.center,
+                        child: Stack(
+                          children: [
+                            CubeFace(
+                              transform: Matrix4.identity(),
+                              color: Colors.blue.withOpacity(0.2), // Front
+                              size: cubeSize,
                             ),
-                          ),
-                          // Back face
-                          Transform(
-                            transform: Matrix4.identity()
-                              ..translate(0.0, 0.0, cubeSize),
-                            alignment: Alignment.center,
-                            child: Container(
-                              width: cubeSize,
-                              height: cubeSize,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(color: Colors.black, width: 1.0),
-                              ),
+                            CubeFace(
+                              transform: Matrix4.identity()..translate(0.0, 0.0, cubeSize),
+                              color: Colors.red.withOpacity(0.2), // Back
+                              size: cubeSize,
                             ),
-                          ),
-                          // Left face
-                          Transform(
-                            transform: Matrix4.identity()
-                              ..translate(-cubeSize / 2, 0.0, cubeSize / 2)
-                              ..rotateY(-pi / 2),
-                            alignment: Alignment.center,
-                            child: Container(
-                              width: cubeSize,
-                              height: cubeSize,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(color: Colors.black, width: 1.0),
-                              ),
+                            CubeFace(
+                              transform: Matrix4.identity()
+                                ..translate(-cubeSize / 2, 0.0, cubeSize / 2)
+                                ..rotateY(-pi / 2),
+                              color: Colors.green.withOpacity(0.2), // Left
+                              size: cubeSize,
                             ),
-                          ),
-                          // Right face
-                          Transform(
-                            transform: Matrix4.identity()
-                              ..translate(cubeSize / 2, 0.0, cubeSize / 2)
-                              ..rotateY(pi / 2),
-                            alignment: Alignment.center,
-                            child: Container(
-                              width: cubeSize,
-                              height: cubeSize,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(color: Colors.black, width: 1.0),
-                              ),
+                            CubeFace(
+                              transform: Matrix4.identity()
+                                ..translate(cubeSize / 2, 0.0, cubeSize / 2)
+                                ..rotateY(pi / 2),
+                              color: Colors.yellow.withOpacity(0.2), // Right
+                              size: cubeSize,
                             ),
-                          ),
-                          // Top face
-                          Transform(
-                            transform: Matrix4.identity()
-                              ..translate(0.0, -cubeSize / 2, cubeSize / 2)
-                              ..rotateX(pi / 2),
-                            alignment: Alignment.center,
-                            child: Container(
-                              width: cubeSize,
-                              height: cubeSize,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(color: Colors.black, width: 1.0),
-                              ),
+                            CubeFace(
+                              transform: Matrix4.identity()
+                                ..translate(0.0, -cubeSize / 2, cubeSize / 2)
+                                ..rotateX(pi / 2),
+                              color: Colors.purple.withOpacity(0.2), // Top
+                              size: cubeSize,
                             ),
-                          ),
-                          // Bottom face
-                          Transform(
-                            transform: Matrix4.identity()
-                              ..translate(0.0, cubeSize / 2, cubeSize / 2)
-                              ..rotateX(-pi / 2),
-                            alignment: Alignment.center,
-                            child: Container(
-                              width: cubeSize,
-                              height: cubeSize,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(color: Colors.black, width: 1.0),
-                              ),
+                            CubeFace(
+                              transform: Matrix4.identity()
+                                ..translate(0.0, cubeSize / 2, cubeSize / 2)
+                                ..rotateX(-pi / 2),
+                              color: Colors.orange.withOpacity(0.2), // Bottom
+                              size: cubeSize,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  // Dot in the middle
-                  Container(
-                    width: 3.0,
-                    height: 3.0,
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                      shape: BoxShape.circle,
+                    Container(
+                      width: 3.0,
+                      height: 3.0,
+                      decoration: const BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -195,23 +141,43 @@ class _CubeControlPanelState extends State<CubeControlPanel> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: increaseSize,
-              child: const Text('+'),
-            ),
+            ElevatedButton(onPressed: increaseSize, child: const Text('+')),
             const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: decreaseSize,
-              child: const Text('-'),
-            ),
+            ElevatedButton(onPressed: decreaseSize, child: const Text('-')),
             const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: resetSize,
-              child: const Text('='),
-            ),
+            ElevatedButton(onPressed: resetSize, child: const Text('=')),
           ],
         ),
       ],
+    );
+  }
+}
+
+class CubeFace extends StatelessWidget {
+  final Matrix4 transform;
+  final Color color;
+  final double size;
+
+  const CubeFace({
+    super.key,
+    required this.transform,
+    required this.color,
+    required this.size,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform(
+      transform: transform,
+      alignment: Alignment.center,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: color,
+          border: Border.all(color: Colors.black, width: 1.0),
+        ),
+      ),
     );
   }
 }
